@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tic-tac-toe</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background-color: bisque;
+      }
+      .board {
+        width: 500px;
+        height: 500px;
+        background-color: rgb(182, 153, 225);
+        border: 5px solid rgb(70, 68, 68);
+        display: flex;
+        flex-wrap: wrap;
+        box-shadow: rgba(240, 46, 170, 0.4) 5px 5px,
+          rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px,
+          rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+      }
+      .cell {
+        width: calc((490px) / 3);
+        height: calc(490px / 3);
+        border: 0.1px solid rgb(98, 94, 94);
+        font-size: 6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: aliceblue;
+      }
+      .cell:hover{
+        cursor: pointer;
+      }
+      #winner {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        color: rgb(49, 36, 20);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="winner">Turn: X</div>
+    <div class="board"></div>
+    <script>
+      const board = document.querySelector(".board");
+      const info = document.getElementById("winner");
+      let turn = "x";
+      let matrix = [];
+      function createBoard() {
+        for (let i = 0; i < 3; i++) {
+          let row = [];
+          for (let j = 0; j < 3; j++) {
+            const cell = document.createElement("div");
+            cell.setAttribute("data-key", `${i}-${j}`);
+            cell.classList.add("cell");
+            board.appendChild(cell);
+            row.push(-1);
+          }
+          matrix.push(row);
+        }
+      }
+      function disableClick() {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach((cell) => {
+          cell.removeEventListener("click", placeSymbol);
+        });
+      }
+      function showConfetti() {
+        const count = 300,
+          defaults = {
+            origin: { y: 0.8 },
+          };
+
+        function fire(particleRatio, opts) {
+          confetti(
+            Object.assign({}, defaults, opts, {
+              particleCount: Math.floor(count * particleRatio),
+            })
+          );
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+
+        fire(0.2, {
+          spread: 60,
+        });
+
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8,
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2,
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+      }
+      function checkWinner(player, val) {
+        if (matrix[0][0] == val && matrix[1][1] == val && matrix[2][2] == val) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[0][2] == val &&
+          matrix[1][1] == val &&
+          matrix[2][0] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[0][0] == val &&
+          matrix[0][1] == val &&
+          matrix[0][2] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[1][0] == val &&
+          matrix[1][1] == val &&
+          matrix[1][2] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[2][0] == val &&
+          matrix[2][1] == val &&
+          matrix[2][2] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[0][0] == val &&
+          matrix[1][0] == val &&
+          matrix[2][0] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[0][1] == val &&
+          matrix[1][1] == val &&
+          matrix[2][1] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        } else if (
+          matrix[0][2] == val &&
+          matrix[1][2] == val &&
+          matrix[2][2] == val
+        ) {
+          info.innerText = `${player} won!!`;
+          disableClick();
+          showConfetti();
+        }
+      }
+      function checkDraw() {
+        let count = 0;
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            if (matrix[i][j] != -1) count++;
+          }
+        }
+        if (count == 9) info.innerText = "A draw!!";
+      }
+      function placeSymbol(e) {
+        if (turn === "x") {
+          if (!e.target.innerText) {
+            e.target.innerText = "X";
+            turn = "o";
+            info.innerText = `Turn: ${turn}`;
+            let [row, col] = e.target.dataset.key.split("-").map(Number);
+            matrix[row][col] = 1;
+            checkWinner("x", 1);
+            checkDraw();
+          }
+        } else if (turn == "o") {
+          if (!e.target.innerText) {
+            e.target.innerText = "O";
+            turn = "x";
+            info.innerText = `Turn: ${turn}`;
+            let [row, col] = e.target.dataset.key.split("-").map(Number);
+            matrix[row][col] = 0;
+            checkWinner("o", 0);
+            checkDraw();
+          }
+        }
+      }
+      createBoard();
+      const cells = document.querySelectorAll(".cell");
+      cells.forEach((cell) => {
+        cell.addEventListener("click", placeSymbol);
+      });
+    </script>
+  </body>
+</html>
